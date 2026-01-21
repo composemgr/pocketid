@@ -1,0 +1,40 @@
+# nginx proxy address - http://172.17.0.1:59072
+
+name: pocketid
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: ghcr.io/pocket-id/pocket-id:latest
+    container_name: pocketid-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      TRUST_PROXY: true
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+      APP_URL: https://${BASE_HOST_NAME:-$HOSTNAME}
+      MAXMIND_LICENSE_KEY: 
+    ports:
+      - '172.17.0.1:59072:1411'
+    volumes:
+      - './rootfs/data/pocketid:/app/data:z'
+    healthcheck:
+      test: 'curl -f http://localhost:1411/healthz'
+      interval: 1m30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+    networks:
+      - pocketid
+
+networks:
+  pocketid:
+    name: pocketid
+    external: false
