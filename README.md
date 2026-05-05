@@ -45,7 +45,7 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/data/pocketid` - Data storage
+- `./volumes/data/pocketid` - Data storage
 
 ## 🔍 Logging
 
