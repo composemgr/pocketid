@@ -17,10 +17,9 @@ services:
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
-      TRUST_PROXY: true
-      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
-      APP_URL: https://${BASE_HOST_NAME:-$HOSTNAME}
-      MAXMIND_LICENSE_KEY: 
+      TRUST_PROXY: "true"
+      APP_URL: https://${BASE_HOST_NAME:-localhost}.${BASE_DOMAIN_NAME:-example.com}
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:-}
     ports:
       - '172.17.0.1:59072:1411'
     volumes:
