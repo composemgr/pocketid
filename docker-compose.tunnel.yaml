@@ -1,0 +1,44 @@
+name: pocketid
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: ghcr.io/pocket-id/pocket-id:latest
+    container_name: pocketid-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      TRUST_PROXY: "true"
+      APP_URL: https://${BASE_HOST_NAME:-localhost}.${BASE_DOMAIN_NAME:-example.com}
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:-}
+      CONTAINER_NAME: pocketid-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    volumes:
+      - './volumes/data/pocketid:/app/data:z'
+    healthcheck:
+      test: 'curl -f http://localhost:1411/healthz'
+      interval: 1m30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+    labels:
+      - 'cloudflare.enable=true'
+      - 'cloudflare.service=http://pocketid-app:1411'
+      - 'cloudflare.hostname=${BASE_HOST_NAME:-$HOSTNAME}'
+    networks:
+      - pocketid
+      - cloudflare
+
+networks:
+  pocketid:
+    name: pocketid
+    external: false
+  cloudflare:
+    external: true
